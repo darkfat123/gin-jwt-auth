@@ -2,12 +2,15 @@ package utils
 
 import (
 	"errors"
+	"gin-jwt-auth/config"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtSecret = []byte("your-secret-key")
+var conf = config.LoadConfig()
+
+var jwtSecret = []byte(conf.JwtSecret)
 
 func GenerateJWT(username string) (string, error) {
 	claims := jwt.MapClaims{

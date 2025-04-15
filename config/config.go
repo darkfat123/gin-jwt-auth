@@ -1,11 +1,13 @@
 package config
 
 import (
-	"log"
 	"os"
+
+	"gin-jwt-auth/pkg/logger"
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"go.uber.org/zap"
 )
 
 type Config struct {
@@ -15,26 +17,32 @@ type Config struct {
 	DBPort     string
 	DBName     string
 	ServerPort string
+	Env        string
+	JwtSecret  string
 }
 
 func LoadConfig() *Config {
 	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found, using system environment variables")
+		logger.Error("No .env file found, using system environment variables")
 	}
 
 	return &Config{
-		DBUser:     getEnv("DB_USER", ""),
-		DBPassword: getEnv("DB_PASSWORD", ""),
-		DBHost:     getEnv("DB_HOST", ""),
-		DBPort:     getEnv("DB_PORT", ""),
-		DBName:     getEnv("DB_NAME", ""),
-		ServerPort: getEnv("SERVER_PORT", ""),
+		DBUser:     mustGetEnv("DB_USER"),
+		DBPassword: mustGetEnv("DB_PASSWORD"),
+		DBHost:     mustGetEnv("DB_HOST"),
+		DBPort:     mustGetEnv("DB_PORT"),
+		DBName:     mustGetEnv("DB_NAME"),
+		ServerPort: mustGetEnv("SERVER_PORT"),
+		Env:        mustGetEnv("ENVIRONMENT"),
+		JwtSecret:  mustGetEnv("JWT_SECRET"),
 	}
+
 }
 
-func getEnv(key, fallback string) string {
-	if value := os.Getenv(key); value != "" {
-		return value
+func mustGetEnv(key string) string {
+	val := os.Getenv(key)
+	if val == "" {
+		logger.Error("Missing required environment variable", zap.String("key", key))
 	}
-	return fallback
+	return val
 }

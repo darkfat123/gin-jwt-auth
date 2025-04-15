@@ -24,11 +24,10 @@ func (h *LoginHandler) LoginUser(c *gin.Context) {
 
 	token, err := h.service.LoginUser(c.Request.Context(), req)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
 	}
 
-	// ✅ ส่ง token กลับให้ client
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Login Successfully!",
 		"token":   token,

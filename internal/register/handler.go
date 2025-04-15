@@ -24,7 +24,7 @@ func (h *RegisterHandler) RegisterUser(c *gin.Context) {
 
 	err := h.service.RegisterUser(c.Request.Context(), req)
 	if err != nil {
-		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+		c.JSON(http.StatusConflict, gin.H{"error": "username or email already exists"})
 		return
 	}
 
