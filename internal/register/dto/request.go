@@ -1,4 +1,4 @@
-package model
+package dto
 
 type RegisterRequest struct {
 	Username string `db:"username" json:"username"`

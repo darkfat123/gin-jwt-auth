@@ -1,8 +1,8 @@
-package repository
+package register
 
 import (
 	"context"
-	"gin-jwt-auth/internal/model"
+	"gin-jwt-auth/internal/register/dto"
 	"gin-jwt-auth/pkg/utils"
 	"log"
 	"time"
@@ -11,7 +11,7 @@ import (
 )
 
 type RegisterRepository interface {
-	Register(ctx context.Context, req model.RegisterRequest) error
+	Register(ctx context.Context, req dto.RegisterRequest) error
 }
 
 type registerRepository struct {
@@ -22,7 +22,7 @@ func NewRegisterRepository(db *sqlx.DB) RegisterRepository {
 	return &registerRepository{db: db}
 }
 
-func (r *registerRepository) Register(ctx context.Context, req model.RegisterRequest) error {
+func (r *registerRepository) Register(ctx context.Context, req dto.RegisterRequest) error {
 	hashPassword, err := utils.HashPassword(req.Password)
 	if err != nil {
 		return err
