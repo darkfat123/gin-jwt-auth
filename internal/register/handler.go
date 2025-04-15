@@ -24,9 +24,9 @@ func (h *RegisterHandler) RegisterUser(c *gin.Context) {
 
 	err := h.service.RegisterUser(c.Request.Context(), req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to Register user"})
+		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"error": "Registered Successfully!"})
+	c.JSON(http.StatusCreated, gin.H{"message": "Registered Successfully!"})
 }
