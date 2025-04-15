@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"errors"
 	"gin-jwt-auth/config"
 	"net/http"
 	"strings"
@@ -33,39 +32,10 @@ func GenerateJWT(username string) (string, error) {
 	return tokenString, nil
 }
 
-func ValidateJWT(tokenString string, username string) (bool, error) {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return jwtSecret, nil
-	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
-
-	if err != nil {
-		return false, err
-	}
-
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		expUnix, ok := claims["exp"].(float64)
-		if !ok {
-			return false, errors.New("invalid exp claim")
-		}
-
-		if int64(expUnix) < time.Now().Unix() {
-			return false, errors.New("token expired")
-		}
-
-		if claims["iss"] != username {
-			return false, errors.New("invalid issuer")
-		}
-
-		return true, nil
-	}
-
-	return false, errors.New("invalid token claims")
-}
-
 func JWTAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
-		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
+		if authHeader == "" || !strings.HasPrefix(strings.ToLower(authHeader), "bearer ") {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization token not provided"})
 			c.Abort()
 			return
@@ -80,12 +50,18 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 			return jwtSecret, nil
 		})
 
-		if err != nil || !token.Valid {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			c.Abort()
 			return
 		}
 
-		c.Next()
+		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+			c.Set("user", claims["iss"])
+			c.Next()
+		} else {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
+			c.Abort()
+		}
 	}
 }
