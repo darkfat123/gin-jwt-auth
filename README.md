@@ -7,7 +7,7 @@
 <h3 align="center">Gin JWT Auth API</h3>
 
   <p align="center">
-    A Go (Gin) starter template for auth – includes register, login, and token-protected routes to save time when starting new projects.
+    A Go (Gin) starter template for auth – includes register, login, and token-protected routes to save time when my starting new projects.
     <br />
     <br />
     <a href="https://github.com/darkfat123/typing-race-web-multiplayer/issues">🚨 Report Bug</a>
