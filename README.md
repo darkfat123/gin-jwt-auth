@@ -10,11 +10,11 @@
     A Go (Gin) starter template for auth – includes register, login, and token-protected routes to save time when my starting new projects.
     <br />
     <br />
-    <a href="https://github.com/darkfat123/typing-race-web-multiplayer/issues">🚨 Report Bug</a>
+    <a href="https://github.com/darkfat123/gin-jwt-auth/issues">🚨 Report Bug</a>
     ·
-    <a href="https://github.com/darkfat123/typing-race-web-multiplayer/issues">✉️ Request Feature</a>
+    <a href="https://github.com/darkfat123/gin-jwt-auth/issues">✉️ Request Feature</a>
     .
-    <a href="https://github.com/darkfat123/typing-race-web-multiplayer?tab=readme-ov-file#-getting-started-for-development-only">🚀 Getting Started</a>
+    <a href="https://github.com/darkfat123/gin-jwt-auth?tab=readme-ov-file#-getting-started-for-development-only">🚀 Getting Started</a>
   </p>
 </div>
 <img src="https://i.imgur.com/dBaSKWF.gif" height="30" width="100%">
@@ -43,6 +43,7 @@ cd gin-jwt-auth
 ```
 #### 2. Backend
 ```bash
+go mod init gin-jwt-auth
 go mod tidy
 go run cmd/main.go
 ```
