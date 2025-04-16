@@ -41,14 +41,8 @@
 git clone https://github.com/darkfat123/gin-jwt-auth.git
 cd gin-jwt-auth
 ```
-#### 2. Backend
-```bash
-go mod init gin-jwt-auth
-go mod tidy
-go run cmd/main.go
-```
 
-#### 3. Environment Variables
+#### 2. Environment Variables
 ```bash
 # root .env
 DB_USER=<YOUR_DB_USER>
@@ -61,6 +55,14 @@ JWT_SECRET=<YOUR_SECRET>
 ENVIRONMENT=dev
 ALLOWED_ORIGINS=<YOUR_ORIGINS>
 ```
+
+#### 3. Backend
+```bash
+go mod init gin-jwt-auth
+go mod tidy
+go run cmd/main.go
+```
+
 <img src="https://i.imgur.com/dBaSKWF.gif" height="30" width="100%">
 
 ### 🚨 Example Usage
