@@ -30,7 +30,7 @@ func NewLoginRepository(db *sqlx.DB) LoginRepository {
 func (r *loginRepository) Login(ctx context.Context, req dto.LoginRequest) (*model.User, error) {
 	var user model.User
 
-	query := `SELECT id,username, password FROM users WHERE username = $1`
+	query := `SELECT * FROM users WHERE username = $1`
 	err := r.db.GetContext(ctx, &user, query, req.Username)
 	if err != nil {
 		logger.Error("failed to fetch user", zap.String("username", req.Username), zap.Error(err))

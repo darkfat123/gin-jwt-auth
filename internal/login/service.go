@@ -12,7 +12,7 @@ import (
 )
 
 type LoginService interface {
-	LoginUser(ctx context.Context, req dto.LoginRequest) (*model.TokenPair, error)
+	LoginUser(ctx context.Context, req dto.LoginRequest) (*model.TokenPair, *model.User, error)
 }
 
 type loginService struct {
@@ -23,29 +23,29 @@ func NewLoginService(repo LoginRepository) LoginService {
 	return &loginService{repo: repo}
 }
 
-func (s *loginService) LoginUser(ctx context.Context, req dto.LoginRequest) (*model.TokenPair, error) {
+func (s *loginService) LoginUser(ctx context.Context, req dto.LoginRequest) (*model.TokenPair, *model.User, error) {
 	user, err := s.repo.Login(ctx, req)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	isValid := utils.CheckPasswordHash(req.Password, user.Password)
 	if !isValid {
 		logger.Info("invalid password attempt", zap.String("username", req.Username))
-		return nil, errors.New("invalid credentials")
+		return nil, nil, errors.New("invalid credentials")
 	}
 
 	tokens, err := utils.GenerateJWT(req.Username)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	err = s.repo.InsertRefreshToken(ctx, tokens.RefreshToken, user)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	logger.Info("login attempt for user", zap.String("username", req.Username))
 
-	return tokens, nil
+	return tokens, user, nil
 }
