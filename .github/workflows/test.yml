@@ -1,0 +1,35 @@
+name: Test Gin API
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2 
+
+      - name: Set up Go
+        uses: actions/setup-go@v3 
+        with:
+          go-version: '1.24'
+
+      - name: Install dependencies
+        run: |
+          go mod tidy
+
+      - name: Run Tests
+        run: |
+          go test -v ./... 
+          
+    #   - name: Upload Test Coverage
+    #     uses: codecov/codecov-action@v2  # ถ้าคุณต้องการส่ง coverage ไปยัง codecov
+    #     with:
+    #       file: ./coverage.out  # ไฟล์ที่เก็บผลการทดสอบ coverage (ถ้ามี)
