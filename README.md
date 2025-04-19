@@ -81,10 +81,13 @@ POST /auth/login
 }
 # → Returns JWT Token
 
+POST /auth/refresh
+Cookies refresh_token
+# → Returns JWT Token
+
 GET /api/users/1
 # → Requires Bearer Token
 Authorization: Bearer <your-jwt-token>
-
 ```
 
 <img src="https://i.imgur.com/dBaSKWF.gif" height="30" width="100%">
