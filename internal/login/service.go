@@ -40,6 +40,11 @@ func (s *loginService) LoginUser(ctx context.Context, req dto.LoginRequest) (*mo
 		return nil, err
 	}
 
+	err = s.repo.InsertRefreshToken(ctx, tokens.RefreshToken, user)
+	if err != nil {
+		return nil, err
+	}
+
 	logger.Info("login attempt for user", zap.String("username", req.Username))
 
 	return tokens, nil

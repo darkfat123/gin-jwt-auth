@@ -1,6 +1,9 @@
 package utils
 
 import (
+	"encoding/base64"
+	"encoding/json"
+	"fmt"
 	"gin-jwt-auth/config"
 	"gin-jwt-auth/model"
 	"net/http"
@@ -15,6 +18,8 @@ import (
 var conf = config.LoadConfig()
 
 var jwtSecret = []byte(conf.JwtSecret)
+
+type JWTClaims map[string]interface{}
 
 func GenerateJWT(username string) (*model.TokenPair, error) {
 	var pair model.TokenPair
@@ -91,4 +96,29 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 
 func generateUUID() uuid.UUID {
 	return uuid.New()
+}
+
+func DecodeJWT(token string) (JWTClaims, error) {
+	parts := strings.Split(token, ".")
+	if len(parts) != 3 {
+		return nil, fmt.Errorf("invalid token format")
+	}
+
+	payloadSegment := parts[1]
+	padding := len(payloadSegment) % 4
+	if padding > 0 {
+		payloadSegment += strings.Repeat("=", 4-padding)
+	}
+
+	payloadBytes, err := base64.URLEncoding.DecodeString(payloadSegment)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode payload: %v", err)
+	}
+
+	var claims JWTClaims
+	if err := json.Unmarshal(payloadBytes, &claims); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal payload: %v", err)
+	}
+
+	return claims, nil
 }

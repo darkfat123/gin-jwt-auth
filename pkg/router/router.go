@@ -2,6 +2,7 @@ package router
 
 import (
 	"gin-jwt-auth/internal/login"
+	"gin-jwt-auth/internal/refresh"
 	"gin-jwt-auth/internal/register"
 	"gin-jwt-auth/internal/user"
 	"gin-jwt-auth/pkg/utils"
@@ -23,6 +24,11 @@ func AddRoutes(r *gin.Engine, db *sqlx.DB) {
 	loginService := login.NewLoginService(loginRepo)
 	loginHandler := login.NewLoginHandler(loginService)
 	auth.POST("/login", loginHandler.LoginUser)
+
+	refreshRepo := refresh.NewRefreshRepository(db)
+	refreshService := refresh.NewRefreshService(refreshRepo)
+	refreshHandler := refresh.NewRefreshHandler(refreshService)
+	auth.POST("/refresh", refreshHandler.RefreshUser)
 
 	//Need bearer token
 	api := r.Group("/api")
