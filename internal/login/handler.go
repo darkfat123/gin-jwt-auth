@@ -17,6 +17,7 @@ func NewLoginHandler(service LoginService) *LoginHandler {
 
 func (h *LoginHandler) LoginUser(c *gin.Context) {
 	var req dto.LoginRequest
+
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return
@@ -27,6 +28,8 @@ func (h *LoginHandler) LoginUser(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
 	}
+
+	c.SetCookie("refresh_token", token.RefreshToken, 7*86400, "/auth/refresh", "localhost", true, true)
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Login Successfully!",

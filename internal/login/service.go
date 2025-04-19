@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"gin-jwt-auth/internal/login/dto"
+	"gin-jwt-auth/model"
 	"gin-jwt-auth/pkg/logger"
 	"gin-jwt-auth/pkg/utils"
 
@@ -11,7 +12,7 @@ import (
 )
 
 type LoginService interface {
-	LoginUser(ctx context.Context, req dto.LoginRequest) (string, error)
+	LoginUser(ctx context.Context, req dto.LoginRequest) (*model.TokenPair, error)
 }
 
 type loginService struct {
@@ -22,24 +23,24 @@ func NewLoginService(repo LoginRepository) LoginService {
 	return &loginService{repo: repo}
 }
 
-func (s *loginService) LoginUser(ctx context.Context, req dto.LoginRequest) (string, error) {
+func (s *loginService) LoginUser(ctx context.Context, req dto.LoginRequest) (*model.TokenPair, error) {
 	user, err := s.repo.Login(ctx, req)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	isValid := utils.CheckPasswordHash(req.Password, user.Password)
 	if !isValid {
 		logger.Info("invalid password attempt", zap.String("username", req.Username))
-		return "", errors.New("invalid credentials")
+		return nil, errors.New("invalid credentials")
 	}
 
-	token, err := utils.GenerateJWT(req.Username)
+	tokens, err := utils.GenerateJWT(req.Username)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	logger.Info("login attempt for user", zap.String("username", req.Username))
 
-	return token, nil
+	return tokens, nil
 }

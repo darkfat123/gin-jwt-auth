@@ -2,34 +2,57 @@ package utils
 
 import (
 	"gin-jwt-auth/config"
+	"gin-jwt-auth/model"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
 var conf = config.LoadConfig()
 
 var jwtSecret = []byte(conf.JwtSecret)
 
-func GenerateJWT(username string) (string, error) {
-	claims := jwt.MapClaims{
+func GenerateJWT(username string) (*model.TokenPair, error) {
+	var pair model.TokenPair
+	accessClaims := jwt.MapClaims{
 		"iss": username,
 		"exp": time.Now().Add(24 * time.Hour).Unix(),
 		"iat": time.Now().Unix(),
 		"sub": "access_token",
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, accessClaims)
 
-	tokenString, err := token.SignedString(jwtSecret)
+	accessString, err := accessToken.SignedString(jwtSecret)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return tokenString, nil
+	refreshClaims := jwt.MapClaims{
+		"iss": username,
+		"exp": time.Now().Add(24 * time.Hour).Unix(),
+		"iat": time.Now().Unix(),
+		"sub": "refresh_token",
+		"jti": generateUUID(),
+	}
+
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims)
+
+	refreshString, err := refreshToken.SignedString(jwtSecret)
+	if err != nil {
+		return nil, err
+	}
+
+	pair = model.TokenPair{
+		AccessToken:  accessString,
+		RefreshToken: refreshString,
+	}
+
+	return &pair, nil
 }
 
 func JWTAuthMiddleware() gin.HandlerFunc {
@@ -64,4 +87,8 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 			c.Abort()
 		}
 	}
+}
+
+func generateUUID() uuid.UUID {
+	return uuid.New()
 }
